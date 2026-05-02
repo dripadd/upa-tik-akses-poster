@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR Poster — Log Akses Ruang Server UPA TIK</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #e5e7eb;
+  padding: 24px;
+  color: #1a1a1a;
+}
+
+/* ── Editor section (hide saat print) ── */
+.editor {
+  max-width: 600px;
+  margin: 0 auto 24px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+.editor h2 { font-size: 14px; color: #0290d9; margin-bottom: 10px; letter-spacing: 0.5px; }
+.editor label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+.editor input, .editor select {
+  width: 100%; padding: 9px 11px; font-size: 13px;
+  border: 1px solid #d1d5db; border-radius: 6px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+.editor .row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; margin-bottom: 10px; }
+.editor button {
+  padding: 9px 16px; font-size: 13px; font-weight: 600;
+  background: #0290d9; color: #fff; border: none; border-radius: 6px;
+  cursor: pointer; font-family: inherit;
+}
+.editor button:hover { opacity: 0.9; }
+.editor .hint { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+/* ── Poster (yang di-print) ── */
+.poster-wrap {
+  max-width: 595px; /* A5 portrait width @ 96dpi ≈ 559px, A4 ≈ 794px */
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.poster {
+  /* A5 aspect ratio (148×210mm) — fit print */
+  background: #fff;
+  padding: 30px 28px 24px;
+  text-align: center;
+  border-top: 8px solid #0290d9;
+  position: relative;
+}
+.poster::after {
+  content: ''; display: block; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 6px;
+  background: #c1272d;
+}
+
+/* ── Header ── */
+.poster-header { margin-bottom: 12px; }
+.brand-mark {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-bottom: 6px;
+}
+.brand-logo {
+  height: 56px; width: auto;
+  object-fit: contain;
+  display: block;
+}
+.brand-text { text-align: left; padding-left: 4px; border-left: 2px solid #e5e7eb; }
+.brand-name { font-size: 16px; font-weight: 800; color: #0290d9; line-height: 1; letter-spacing: 1px; }
+.brand-sub { font-size: 9px; color: #6b7280; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 3px; }
+
+/* ── Title ── */
+.title-block {
+  background: #0290d9; color: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+.title-eyebrow {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  opacity: 0.85; margin-bottom: 3px; font-weight: 600;
+}
+.title-main {
+  font-size: 22px; font-weight: 800; letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+.title-sub {
+  font-size: 11px; opacity: 0.85; margin-top: 4px;
+  letter-spacing: 1px;
+}
+
+/* ── QR ── */
+.qr-container {
+  background: #fff;
+  border: 3px solid #0290d9;
+  border-radius: 12px;
+  padding: 10px;
+  display: inline-block;
+  margin-bottom: 14px;
+  position: relative;
+}
+.qr-container::before, .qr-container::after,
+.qr-container .corner-tr, .qr-container .corner-bl {
+  content: ''; position: absolute;
+  width: 18px; height: 18px;
+  border: 4px solid #c1272d;
+}
+.qr-container::before { top: -4px; left: -4px; border-right: none; border-bottom: none; border-top-left-radius: 6px; }
+.qr-container::after { bottom: -4px; right: -4px; border-left: none; border-top: none; border-bottom-right-radius: 6px; }
+.qr-container .corner-tr { top: -4px; right: -4px; border-left: none; border-bottom: none; border-top-right-radius: 6px; }
+.qr-container .corner-bl { bottom: -4px; left: -4px; border-right: none; border-top: none; border-bottom-left-radius: 6px; }
+.qr-img {
+  display: block;
+  width: 280px; height: 280px;
+  background: #fff;
+}
+.qr-loading {
+  width: 280px; height: 280px;
+  display: flex; align-items: center; justify-content: center;
+  background: #f3f4f6; color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ── Instructions ── */
+.instructions {
+  text-align: left;
+  background: #f9fafb;
+  border-left: 4px solid #0290d9;
+  padding: 12px 14px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+}
+.instructions-title {
+  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: #0290d9; font-weight: 700; margin-bottom: 6px;
+}
+.instructions ol {
+  list-style: none; counter-reset: step;
+  padding: 0; margin: 0;
+}
+.instructions li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #374151;
+  line-height: 1.4;
+}
+.instructions li::before {
+  content: counter(step);
+  position: absolute; left: 0; top: 0;
+  width: 18px; height: 18px;
+  background: #0290d9; color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+
+/* ── Warning banner ── */
+.warning {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: #92400e;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: left;
+}
+.warning strong { display: block; font-size: 11px; margin-bottom: 2px; letter-spacing: 0.3px; }
+
+/* ── Tips first-time scan box ── */
+.tip-firsttime {
+  background: #eff6ff;
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 10.5px;
+  color: #1e3a8a;
+  margin-bottom: 10px;
+  text-align: left;
+  line-height: 1.5;
+}
+.tip-firsttime strong { color: #0290d9; }
+.tip-firsttime em { font-style: normal; background: #dbeafe; padding: 0 4px; border-radius: 3px; font-weight: 600; }
+
+/* ── Footer ── */
+.poster-footer {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 10px;
+  font-size: 9px;
+  color: #6b7280;
+  letter-spacing: 0.5px;
+}
+.poster-footer .url {
+  display: none;  /* Hidden default — uncomment kalau mau tampil URL di preview */
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 8px;
+  word-break: break-all;
+  margin-top: 3px;
+  color: #0290d9;
+  opacity: 0.7;
+}
+
+/* ── Print button ── */
+.print-bar {
+  position: fixed; bottom: 24px; right: 24px;
+  display: flex; gap: 8px;
+  z-index: 100;
+}
+.print-bar button {
+  padding: 12px 20px; font-size: 14px; font-weight: 700;
+  border: none; border-radius: 8px;
+  cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-family: inherit;
+}
+.btn-print { background: #0290d9; color: #fff; }
+.btn-download { background: #fff; color: #0290d9; border: 2px solid #0290d9 !important; }
+
+/* ── Print styles ── */
+@media print {
+  body { background: #fff; padding: 0; margin: 0; }
+  .editor, .print-bar { display: none !important; }
+  .poster-wrap { box-shadow: none; border: none; max-width: none; }
+  .poster { padding: 24px 22px 20px; min-height: 100vh; }
+  @page { size: A5 portrait; margin: 8mm; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ EDITOR (hide saat print) ═══════ -->
+<div class="editor">
+  <h2>⚙ KONFIGURASI POSTER (preview only — hide saat print)</h2>
+
+  <label>URL Web App (yang di-encode jadi QR)</label>
+  <div class="row">
+    <input type="text" id="webAppUrl" value="https://script.google.com/macros/s/AKfycbyT0raQh8QS_lLTHXpBC1zD56-Nriy--jFC4zxznXwQXrcRkdnR6YShSfhG3gjhHP83iA/exec">
+    <button onclick="regenerate()">Update QR</button>
+  </div>
+  <div class="hint">Paste URL Web App final dari Apps Script Manage Deployments</div>
+
+  <label style="margin-top:10px;">Resolusi QR (px)</label>
+  <select id="qrSize" onchange="regenerate()">
+    <option value="400">400×400 (cepat, untuk preview)</option>
+    <option value="600" selected>600×600 (recommended print)</option>
+    <option value="800">800×800 (high-res, lambat load)</option>
+  </select>
+</div>
+
+<!-- ═══════ POSTER ═══════ -->
+<div class="poster-wrap">
+  <div class="poster">
+
+    <!-- Header brand -->
+    <div class="poster-header">
+      <div class="brand-mark">
+        <img class="brand-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
+        <div class="brand-text">
+          <div class="brand-name">UPA TIK</div>
+          <div class="brand-sub">Internal Tools</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Title block -->
+    <div class="title-block">
+      <div class="title-eyebrow">📋 Log Akses</div>
+      <div class="title-main">RUANG SERVER</div>
+      <div class="title-sub">SCAN QR DI BAWAH SEBELUM MASUK</div>
+    </div>
+
+    <!-- QR -->
+    <div class="qr-container">
+      <span class="corner-tr"></span>
+      <span class="corner-bl"></span>
+      <img id="qrImg" class="qr-img" alt="QR Code Log Akses Ruang Server">
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <div class="instructions-title">CARA PAKAI</div>
+      <ol>
+        <li>Scan QR pakai kamera HP</li>
+        <li>Login akun <strong>@staff.unri.ac.id</strong> (atau akun Google kamu)</li>
+        <li>Pilih <strong>MASUK</strong> + isi divisi, keperluan, pemberi izin</li>
+        <li>Saat keluar: scan ulang → pilih <strong>KELUAR</strong></li>
+      </ol>
+    </div>
+
+    <!-- Tips first-time scan -->
+    <div class="tip-firsttime">
+      <strong>💡 Pertama kali scan?</strong>
+      Kalau muncul layar <em>"Google hasn't verified this app"</em>:
+      tap <strong>Advanced</strong> → tap <strong>"Go to ... (unsafe)"</strong> → <strong>Allow</strong>.
+      Cuma sekali per akun — selanjutnya langsung lancar.
+    </div>
+
+    <!-- Warning -->
+    <div class="warning">
+      <strong>⚠ WAJIB DIISI</strong>
+      Setiap orang masuk ruang server WAJIB log di sistem ini, termasuk staff UPA TIK, vendor, &amp; tamu. Untuk audit &amp; security ruang server.
+    </div>
+
+    <!-- Footer -->
+    <div class="poster-footer">
+      <strong>UPA TIK</strong> · Sistem Log Akses Ruang Server v1.0 · Internal use
+      <div class="url" id="urlText"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════ PRINT BAR (hide saat print) ═══════ -->
+<div class="print-bar">
+  <button class="btn-download" onclick="downloadQR()">⬇ Download QR PNG</button>
+  <button class="btn-print" onclick="window.print()">🖨 Print A5</button>
+</div>
+
+<script>
+function getQrUrl(text, size) {
+  // api.qrserver.com — free QR generator, no auth, returns PNG
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size +
+         '&margin=10&format=png&qzone=2&data=' + encodeURIComponent(text);
+}
+
+function regenerate(silent) {
+  var url = document.getElementById('webAppUrl').value.trim();
+  var size = document.getElementById('qrSize').value;
+  var qrImg = document.getElementById('qrImg');
+  var urlText = document.getElementById('urlText');
+  if (!url) {
+    // Empty state — show placeholder, no alert (silent on initial page load)
+    qrImg.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280" viewBox="0 0 280 280">' +
+      '<rect width="280" height="280" fill="#f3f4f6"/>' +
+      '<text x="140" y="130" font-family="sans-serif" font-size="14" fill="#9ca3af" text-anchor="middle">Paste URL Web App</text>' +
+      '<text x="140" y="155" font-family="sans-serif" font-size="14" fill="#9ca3af" text-anchor="middle">di field atas →</text>' +
+      '<text x="140" y="180" font-family="sans-serif" font-size="14" fill="#9ca3af" text-anchor="middle">klik Update QR</text>' +
+      '</svg>'
+    );
+    if (urlText) urlText.textContent = '';
+    if (!silent) alert('URL kosong — paste dulu URL Web App di field konfigurasi');
+    return;
+  }
+  qrImg.src = getQrUrl(url, size);
+  if (urlText) urlText.textContent = url;
+}
+
+function downloadQR() {
+  var url = document.getElementById('webAppUrl').value.trim();
+  var size = document.getElementById('qrSize').value;
+  if (!url) { alert('URL kosong — paste dulu URL Web App di field konfigurasi'); return; }
+  var qrUrl = getQrUrl(url, size);
+  // Trigger download via temporary link
+  fetch(qrUrl)
+    .then(function(r) { return r.blob(); })
+    .then(function(blob) {
+      var dl = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = dl;
+      a.download = 'qr-log-akses-ruang-server-upa-tik.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(dl);
+    })
+    .catch(function(err) { alert('Gagal download: ' + err.message); });
+}
+
+// Auto-render saat page load
+regenerate(true);
+</script>
+
+</body>
+</html>
