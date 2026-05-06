@@ -343,8 +343,7 @@ canvas.qr-img { width: 280px !important; height: 280px !important; }
 
     <!-- Footer -->
     <div class="poster-footer">
-      <strong>UPA TIK · Universitas Riau</strong> · Sistem Log Akses Ruang Server v2.0 · Kontak: kuswara@staff.unri.ac.id
-      <div class="url" id="urlText"></div>
+      <strong>UPA TIK · Universitas Riau</strong> · Sistem Log Akses Ruang Server v2.0
     </div>
 
   </div>
@@ -380,8 +379,6 @@ function regenerate() {
   var logoSrc  = document.getElementById('qrLogo').value;
 
   if (!url) { alert('URL kosong'); return; }
-
-  document.getElementById('urlText').textContent = url;
 
   var canvas = document.getElementById('qrCanvas');
   canvas.width  = size;
