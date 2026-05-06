@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QR Poster — Log Akses Ruang Server UPA TIK</title>
+<title>QR Poster — Log Akses Ruang Server UPA TIK UNRI</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -62,19 +62,26 @@ body {
 }
 
 /* ── Header ── */
-.poster-header { margin-bottom: 12px; }
+.poster-header { margin-bottom: 14px; text-align: center; }
 .brand-mark {
-  display: inline-flex; align-items: center; gap: 10px;
+  display: inline-flex; align-items: center; gap: 14px;
   margin-bottom: 6px;
 }
 .brand-logo {
-  height: 56px; width: auto;
+  height: 64px; width: auto;
   object-fit: contain;
   display: block;
 }
-.brand-text { text-align: left; padding-left: 4px; border-left: 2px solid #e5e7eb; }
-.brand-name { font-size: 16px; font-weight: 800; color: #0290d9; line-height: 1; letter-spacing: 1px; }
-.brand-sub { font-size: 9px; color: #6b7280; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 3px; }
+.brand-text { text-align: left; padding-left: 12px; border-left: 2px solid #e5e7eb; }
+.brand-name {
+  font-size: 18px; font-weight: 800; color: #0290d9;
+  line-height: 1.05; letter-spacing: 1px;
+}
+.brand-sub {
+  font-size: 9.5px; color: #6b7280;
+  letter-spacing: 1.2px; text-transform: uppercase; margin-top: 4px;
+  max-width: 130px; line-height: 1.3;
+}
 
 /* ── Title ── */
 .title-block {
@@ -120,7 +127,10 @@ body {
   display: block;
   width: 280px; height: 280px;
   background: #fff;
+  /* canvas element specifically — preserve aspect on resize */
+  image-rendering: -webkit-optimize-contrast;
 }
+canvas.qr-img { width: 280px !important; height: 280px !important; }
 .qr-loading {
   width: 280px; height: 280px;
   display: flex; align-items: center; justify-content: center;
@@ -202,7 +212,6 @@ body {
   letter-spacing: 0.5px;
 }
 .poster-footer .url {
-  display: none;  /* Hidden default — uncomment kalau mau tampil URL di preview */
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 8px;
   word-break: break-all;
@@ -242,19 +251,41 @@ body {
 <div class="editor">
   <h2>⚙ KONFIGURASI POSTER (preview only — hide saat print)</h2>
 
-  <label>URL Web App (yang di-encode jadi QR)</label>
+  <label>URL Form (yang di-encode jadi QR)</label>
   <div class="row">
-    <input type="text" id="webAppUrl" value="https://script.google.com/macros/s/AKfycbyT0raQh8QS_lLTHXpBC1zD56-Nriy--jFC4zxznXwQXrcRkdnR6YShSfhG3gjhHP83iA/exec">
+    <input type="text" id="webAppUrl" value="https://cekipsaya.com/akses-server/">
     <button onclick="regenerate()">Update QR</button>
   </div>
-  <div class="hint">Paste URL Web App final dari Apps Script Manage Deployments</div>
+  <div class="hint">URL final v2.0 cross-browser. Pakai cekipsaya.com sebagai proxy untuk Apps Script — work di all browser, all account.</div>
 
-  <label style="margin-top:10px;">Resolusi QR (px)</label>
-  <select id="qrSize" onchange="regenerate()">
-    <option value="400">400×400 (cepat, untuk preview)</option>
-    <option value="600" selected>600×600 (recommended print)</option>
-    <option value="800">800×800 (high-res, lambat load)</option>
-  </select>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;">
+    <div>
+      <label>Resolusi QR</label>
+      <select id="qrSize" onchange="regenerate()">
+        <option value="400">400px (preview)</option>
+        <option value="600" selected>600px (print A5)</option>
+        <option value="800">800px (high-res)</option>
+      </select>
+    </div>
+    <div>
+      <label>Warna QR</label>
+      <select id="qrColor" onchange="regenerate()">
+        <option value="000000" selected>Hitam (klasik, B&amp;W print)</option>
+        <option value="0290d9">Biru UPA TIK</option>
+        <option value="065f46">Hijau UNRI</option>
+        <option value="c1272d">Merah UNRI</option>
+        <option value="1a1a1a">Abu Gelap</option>
+      </select>
+    </div>
+    <div>
+      <label>Logo Tengah</label>
+      <select id="qrLogo" onchange="regenerate()">
+        <option value="logo.png" selected>Logo UNRI ⭐</option>
+        <option value="">Tanpa logo (plain QR)</option>
+      </select>
+    </div>
+  </div>
+  <div class="hint" style="margin-top:6px;">💡 Tip: warna hitam paling reliable untuk B&amp;W printer. Logo embed pakai error-correction Level H (toleran hingga 30% damage).</div>
 </div>
 
 <!-- ═══════ POSTER ═══════ -->
@@ -264,10 +295,10 @@ body {
     <!-- Header brand -->
     <div class="poster-header">
       <div class="brand-mark">
-        <img class="brand-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
+        <img class="brand-logo" src="logo.png" alt="Logo Universitas Riau" onerror="this.style.display='none'">
         <div class="brand-text">
           <div class="brand-name">UPA TIK</div>
-          <div class="brand-sub">Internal Tools</div>
+          <div class="brand-sub">Pusat Teknologi Informasi &amp; Komunikasi</div>
         </div>
       </div>
     </div>
@@ -283,15 +314,15 @@ body {
     <div class="qr-container">
       <span class="corner-tr"></span>
       <span class="corner-bl"></span>
-      <img id="qrImg" class="qr-img" alt="QR Code Log Akses Ruang Server">
+      <canvas id="qrCanvas" class="qr-img" width="600" height="600" aria-label="QR Code Log Akses Ruang Server"></canvas>
     </div>
 
     <!-- Instructions -->
     <div class="instructions">
       <div class="instructions-title">CARA PAKAI</div>
       <ol>
-        <li>Scan QR pakai kamera HP</li>
-        <li>Login akun <strong>@staff.unri.ac.id</strong> (atau akun Google kamu)</li>
+        <li>Scan QR pakai kamera HP — form muncul langsung</li>
+        <li>Isi <strong>Email</strong> &amp; <strong>Nama Lengkap</strong> kamu</li>
         <li>Pilih <strong>MASUK</strong> + isi divisi, keperluan, pemberi izin</li>
         <li>Saat keluar: scan ulang → pilih <strong>KELUAR</strong></li>
       </ol>
@@ -299,10 +330,9 @@ body {
 
     <!-- Tips first-time scan -->
     <div class="tip-firsttime">
-      <strong>💡 Pertama kali scan?</strong>
-      Kalau muncul layar <em>"Google hasn't verified this app"</em>:
-      tap <strong>Advanced</strong> → tap <strong>"Go to ... (unsafe)"</strong> → <strong>Allow</strong>.
-      Cuma sekali per akun — selanjutnya langsung lancar.
+      <strong>💡 Tidak perlu login Google!</strong>
+      Pakai email apapun: <em>@unri.ac.id</em>, <em>@staff.unri.ac.id</em>, <em>@gmail.com</em>, atau email perusahaan kamu.
+      Form work di <strong>semua browser</strong> (Chrome, Safari, Firefox) dan <strong>semua HP</strong> (iPhone, Android).
     </div>
 
     <!-- Warning -->
@@ -313,7 +343,7 @@ body {
 
     <!-- Footer -->
     <div class="poster-footer">
-      <strong>UPA TIK</strong> · Sistem Log Akses Ruang Server v1.0 · Internal use
+      <strong>UPA TIK · Universitas Riau</strong> · Sistem Log Akses Ruang Server v2.0 · Kontak: kuswara@staff.unri.ac.id
       <div class="url" id="urlText"></div>
     </div>
 
@@ -327,58 +357,131 @@ body {
 </div>
 
 <script>
-function getQrUrl(text, size) {
-  // api.qrserver.com — free QR generator, no auth, returns PNG
+// ─────────────────────────────────────────────────────────────
+//  QR Generator dengan Logo Embed di Tengah
+//  - api.qrserver.com untuk basic QR (Level H error correction)
+//  - Canvas overlay untuk logo center (20% size)
+//  - White rounded background di belakang logo (contrast)
+// ─────────────────────────────────────────────────────────────
+
+function getQrUrl(text, size, colorHex) {
+  // ECC=H = Level H (30% error correction) → toleran logo overlay
   return 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size +
-         '&margin=10&format=png&qzone=2&data=' + encodeURIComponent(text);
+         '&margin=10&format=png&qzone=2&ecc=H' +
+         '&color=' + (colorHex || '000000').replace('#', '') +
+         '&bgcolor=ffffff' +
+         '&data=' + encodeURIComponent(text);
 }
 
-function regenerate(silent) {
-  var url = document.getElementById('webAppUrl').value.trim();
-  var size = document.getElementById('qrSize').value;
-  var qrImg = document.getElementById('qrImg');
-  var urlText = document.getElementById('urlText');
-  if (!url) {
-    // Empty state — show placeholder, no alert (silent on initial page load)
-    qrImg.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280" viewBox="0 0 280 280">' +
-      '<rect width="280" height="280" fill="#f3f4f6"/>' +
-      '<text x="140" y="130" font-family="sans-serif" font-size="14" fill="#9ca3af" text-anchor="middle">Paste URL Web App</text>' +
-      '<text x="140" y="155" font-family="sans-serif" font-size="14" fill="#9ca3af" text-anchor="middle">di field atas →</text>' +
-      '<text x="140" y="180" font-family="sans-serif" font-size="14" fill="#9ca3af" text-anchor="middle">klik Update QR</text>' +
-      '</svg>'
-    );
-    if (urlText) urlText.textContent = '';
-    if (!silent) alert('URL kosong — paste dulu URL Web App di field konfigurasi');
-    return;
-  }
-  qrImg.src = getQrUrl(url, size);
-  if (urlText) urlText.textContent = url;
+function regenerate() {
+  var url      = document.getElementById('webAppUrl').value.trim();
+  var size     = parseInt(document.getElementById('qrSize').value, 10);
+  var color    = document.getElementById('qrColor').value;
+  var logoSrc  = document.getElementById('qrLogo').value;
+
+  if (!url) { alert('URL kosong'); return; }
+
+  document.getElementById('urlText').textContent = url;
+
+  var canvas = document.getElementById('qrCanvas');
+  canvas.width  = size;
+  canvas.height = size;
+  var ctx = canvas.getContext('2d');
+
+  // Reset canvas
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
+
+  // 1. Load QR PNG dari API
+  var qrUrl = getQrUrl(url, size, color);
+  var qrImg = new Image();
+  qrImg.crossOrigin = 'anonymous';
+
+  qrImg.onload = function() {
+    ctx.drawImage(qrImg, 0, 0, size, size);
+
+    // 2. Overlay logo di tengah (kalau dipilih)
+    if (logoSrc) {
+      var logoImg = new Image();
+      logoImg.onload = function() {
+        // Logo size = 20% dari QR (sweet spot vs Level H tolerance)
+        var logoSize = Math.round(size * 0.20);
+        var logoX    = (size - logoSize) / 2;
+        var logoY    = (size - logoSize) / 2;
+        var pad      = Math.round(size * 0.018);  // padding ~1.8%
+
+        // Rounded white background untuk contrast logo
+        ctx.fillStyle = '#ffffff';
+        roundRect(ctx, logoX - pad, logoY - pad, logoSize + pad*2, logoSize + pad*2, 8);
+        ctx.fill();
+
+        // Subtle border around white box
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 2;
+        roundRect(ctx, logoX - pad, logoY - pad, logoSize + pad*2, logoSize + pad*2, 8);
+        ctx.stroke();
+
+        // Draw logo (preserve aspect ratio)
+        var logoAspect = logoImg.width / logoImg.height;
+        var drawW = logoSize, drawH = logoSize;
+        if (logoAspect > 1) drawH = logoSize / logoAspect;
+        else drawW = logoSize * logoAspect;
+        var dx = logoX + (logoSize - drawW) / 2;
+        var dy = logoY + (logoSize - drawH) / 2;
+        ctx.drawImage(logoImg, dx, dy, drawW, drawH);
+      };
+      logoImg.onerror = function() {
+        console.warn('Logo gagal load: ' + logoSrc);
+      };
+      logoImg.src = logoSrc;
+    }
+  };
+
+  qrImg.onerror = function() {
+    ctx.fillStyle = '#fee2e2';
+    ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = '#991b1b';
+    ctx.font = '20px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('QR generation failed — cek koneksi', size/2, size/2);
+  };
+
+  qrImg.src = qrUrl;
+}
+
+// Helper: rounded rectangle path
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
 
 function downloadQR() {
-  var url = document.getElementById('webAppUrl').value.trim();
-  var size = document.getElementById('qrSize').value;
-  if (!url) { alert('URL kosong — paste dulu URL Web App di field konfigurasi'); return; }
-  var qrUrl = getQrUrl(url, size);
-  // Trigger download via temporary link
-  fetch(qrUrl)
-    .then(function(r) { return r.blob(); })
-    .then(function(blob) {
-      var dl = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = dl;
-      a.download = 'qr-log-akses-ruang-server-upa-tik.png';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(dl);
-    })
-    .catch(function(err) { alert('Gagal download: ' + err.message); });
+  var canvas = document.getElementById('qrCanvas');
+  if (!canvas) return;
+  canvas.toBlob(function(blob) {
+    if (!blob) { alert('Download gagal — coba regenerate dulu'); return; }
+    var dl = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = dl;
+    a.download = 'qr-log-akses-ruang-server-upa-tik.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(dl);
+  }, 'image/png');
 }
 
 // Auto-render saat page load
-regenerate(true);
+regenerate();
 </script>
 
 </body>
